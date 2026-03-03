@@ -1,4 +1,6 @@
 "use client";
+import { useState } from "react";
+import { Spinner } from "@/components/ui/spinner";
 import { useRouter } from "next/navigation";
 import styles from "../Auth.module.css";
 import { Controller, useForm } from "react-hook-form";
@@ -12,6 +14,7 @@ type LoginSchema = {
 };
 
 export default function Signup() {
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { control, handleSubmit } = useForm<LoginSchema>({
     defaultValues: {
@@ -21,31 +24,37 @@ export default function Signup() {
   });
 
   const onSubmit = (data: LoginSchema) => {
-    fetch("/api/auth/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    })
-      .then((res) => {
-        if (!res.ok && res.headers.get("content-type")?.includes("text/html")) {
-          throw new Error(
-            `Server returned ${res.status}: route not found or server error`,
-          );
-        }
-        return res.json();
+    setLoading(true);
+    try {
+      fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
       })
-      .then((data) => {
-        if (data.error) {
-          alert(data.error);
-        } else {
-          alert("User created! Token: " + data.token);
-          router.push("/auth/login"); 
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        alert("An error occurred: " + err.message);
-      });
+        .then((res) => {
+          if (
+            !res.ok &&
+            res.headers.get("content-type")?.includes("text/html")
+          ) {
+            throw new Error(
+              `Server returned ${res.status}: route not found or server error`,
+            );
+          }
+          return res.json();
+        })
+        .then((data) => {
+          if (data.error) {
+            alert(data.error);
+          } else {
+            alert("User created! Token: " + data.token);
+            router.push("/auth/login");
+          }
+        });
+    } catch (err) {
+      alert("Error connecting to service");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -69,7 +78,7 @@ export default function Signup() {
           />
         </Field>
 
-        <Button type="submit">Sign Up</Button>
+        <Button type="submit">{loading ? <Spinner /> : "Sign Up"}</Button>
 
         <a className={styles.a} href="/auth/login">
           Already have an account? Log In

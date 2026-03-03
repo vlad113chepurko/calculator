@@ -1,4 +1,6 @@
 "use client";
+import { Spinner } from "@/components/ui/spinner";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "../Auth.module.css";
 import { Controller, useForm } from "react-hook-form";
@@ -8,27 +10,33 @@ import { Button } from "@/components/ui/button";
 import { FormSchema } from "@/lib/schema";
 
 export default function Login() {
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { control, handleSubmit } = useForm<FormSchema>();
 
   const onSubmit = (data: FormSchema) => {
-    fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          alert(data.error);
-        } else {
-          router.push("/calculator");
-        }
+    setLoading(true);
+    try {
+      fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
       })
-      .catch((err) => {
-        console.error(err);
-        alert("An error occurred");
-      });
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.error) {
+            alert(data.error);
+          } else {
+            const { token } = data;
+            localStorage.setItem("token", token);
+            router.push("/calculator");
+          }
+        });
+    } catch (err) {
+      alert("Error connecting to service");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -52,7 +60,7 @@ export default function Login() {
           />
         </Field>
 
-        <Button type="submit">Log In</Button>
+        <Button type="submit">{loading ? <Spinner /> : "Log In"}</Button>
 
         <a className={styles.a} href="/auth/signup">
           Don't have an account? Sign Up
