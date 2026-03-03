@@ -1,0 +1,15 @@
+services:
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "3001:3001"
+    environment:
+      - MONGODB_URI=mongodb://host.docker.internal:27017/auth-service
+      - JWT_SECRET=supersecret
+
+  calculator-service:
+    build: ./calculator-service
+    ports:
+      - "3002:3002"
+    environment:
+      - JWT_SECRET=supersecret

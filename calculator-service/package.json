@@ -1,15 +1,12 @@
 {
-  "name": "calculator-service",
+  "name": "auth-service",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "directories": {
-    "lib": "lib"
-  },
+  "main": "next.config.js",
   "scripts": {
-    "dev": "next dev --port 3002",
+    "dev": "next dev --port 3001",
     "build": "next build",
-    "start": "next start --port 3002",
+    "start": "next start --port 3001",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -17,9 +14,15 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "jsonwebtoken": "^9.0.3"
+    "jsonwebtoken": "^9.0.3",
+    "next": "^16.1.6",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
   },
   "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.10"
+    "@types/bcrypt": "^6.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^25.3.3",
+    "typescript": "^5.9.3"
   }
 }
