@@ -1,11 +1,21 @@
 services:
+  mongo:
+    image: mongo:6
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
   auth-service:
     build: ./auth-service
     ports:
       - "3001:3001"
     environment:
-      - MONGODB_URI=mongodb://host.docker.internal:27017/auth-service
+      - MONGODB_URI=mongodb://mongo:27017/auth-service
       - JWT_SECRET=supersecret
+    depends_on:
+      - mongo
 
   calculator-service:
     build: ./calculator-service
@@ -13,3 +23,13 @@ services:
       - "3002:3002"
     environment:
       - JWT_SECRET=supersecret
+      - REDIS_URL=redis://redis:6379
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+
+volumes:
+  mongo-data:
